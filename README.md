@@ -46,7 +46,8 @@ YALFF preserves the orders of the reads of the input files so there is no need f
 
         -t NUM	 Number of threads available. [Hardware concurrency - 1]
 
-        -h 	 See help.
+        -h 	     See this help.
 
-
-
+[1]: http://cb.csail.mit.edu/cb/quartz
+[2]: http://en.wikipedia.org/wiki/GNU_General_Public_License
+[3]: http://zlib.net
