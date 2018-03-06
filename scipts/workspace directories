@@ -1,0 +1,19 @@
+The scripts assume a workspace folder with the following structure:
+
+workspace : root folder
+|
+|-> executables : scripts folder with yalff executable
+|
+|-> reference : contains the reference fasta file and its indexed version
+|
+|-> results : folder containing the results
+    |
+    |-> smooth : folder containing the smoothed gzipped datasets
+    |
+    |-> pipeline : SNP calling results
+|
+|-> tools : folder containing the tools (bwa, rtg plot, etc.)
+|
+| -> working_datasets : folder with the original downloaded datsets (in gzip format).
+|
+|-> quartz_files : folder for quartz and leon files. Contains the dictionary for quartz and the uncompressed datasets in fastq format.

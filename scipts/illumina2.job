@@ -1,0 +1,18 @@
+#RDIR=Your worksapce directory
+
+#Input files
+INPUT1=$RDIR/results/smooth/SRR62_1_smoothed.fastq.gz
+INPUT2=$RDIR/results/smooth/SRR62_2_smoothed.fastq.gz
+
+#Output files
+OUTPUT1=$RDIR/results/smooth/SRR62_1_smoothed_illumina.fastq.gz
+OUTPUT2=$RDIR/results/smooth/SRR62_2_smoothed_illumina.fastq.gz
+
+PTM=$RDIR/executables/PTM
+
+################## SCRIPT #########################
+>&2 date && echo "start illumina smoothing"
+
+$PTM illumina $INPUT2 $OUTPUT2
+
+>&2 date && echo "end" 

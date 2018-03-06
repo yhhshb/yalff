@@ -1,0 +1,36 @@
+#RDIR=Your worksapce directory
+leon=$RDIR/tools/leon-v1.0.0-bin-Linux/bin/leon
+
+PCOUNT=1
+
+#VARIABLES
+INPUT1=$RDIR/quartz_files/SRR622461_1.filt.fastq
+INPUT2=$RDIR/quartz_files/SRR622461_2.filt.fastq
+OUTPUT1=$RDIR/quartz_files/SRR622461_1_leoned.fastq
+OUTPUT2=$RDIR/quartz_files/SRR622461_2_leoned.fastq
+LEONED1=$RDIR/quartz_files/SRR622461_1_leoned.fastq
+LEONED2=$RDIR/quartz_files/SRR622461_2_leoned.fastq
+
+#################### QUARTZ ####################
+>&2 date
+>&2 echo "start leon smoothing"
+
+time $leon -file $INPUT1 -c -nb-cores $PCOUNT
+time $leon -file $INPUT2 -c -nb-cores $PCOUNT
+
+mv $INPUT1.leon $OUTPUT1.leon
+mv $INPUT2.leon $OUTPUT2.leon
+mv $INPUT1.qual $OUTPUT1.qual
+mv $INPUT2.qual $OUTPUT2.qual
+
+time $leon -file $OUTPUT1.leon -d -nb-cores $PCOUNT 
+time $leon -file $OUTPUT2.leon -d -nb-cores $PCOUNT
+
+#gzip -k $LEONED1
+#gzip -k $LEONED2
+#bzip2 -k $LEONED1
+#bzip2 -k $LEONED2
+#xz -k $LEONED1
+#xz -k $LEONED2
+
+>&2 date && >&2 echo "end"

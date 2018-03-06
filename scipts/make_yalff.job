@@ -1,0 +1,10 @@
+#RDIR=Your worksapce directory
+YALFF_FOLDER=$RDIR/tools/yalff
+
+################## SCRIPT #########################
+>&2 date
+>&2 echo "make yalff"
+
+cd $YALFF_FOLDER
+make
+mv $YALFF_FOLDER/build/yalff $RDIR/executables

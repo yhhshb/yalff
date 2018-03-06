@@ -1,0 +1,116 @@
+#RDIR=Your worksapce directory
+bwa=$RDIR/tools/bwa-0.7.16a/bwa
+samtools=$RDIR/tools/samtools-1.5/samtools
+bcftools=$RDIR/tools/bcftools-1.5/bcftools
+bedtools=$RDIR/tools/bedtools2/bin/bamToBed
+bgzip=$RDIR/tools/htslib-1.5/bgzip
+rtg=$RDIR/tools/rtg-tools-3.8.3/rtg
+
+PCOUNT=16
+
+#Reference Files
+REF=$RDIR/reference/hg38.fa
+SDFREF=${REF%.*}.sdf
+GOLD=NA12878
+VCFREF=$RDIR/reference/${GOLD}.vcf.gz
+VCFBED=$RDIR/reference/ConfidentRegions.bed.gz
+
+#Input files
+FULL1=$RDIR/working_datasets/SRR622461_1.filt.fastq.gz
+FULL2=$RDIR/working_datasets/SRR622461_2.filt.fastq.gz
+SMOOTHED1=$RDIR/results/smooth/SRR62_1_smoothed.fastq.gz
+SMOOTHED2=$RDIR/results/smooth/SRR62_2_smoothed.fastq.gz
+FILTERED1=$RDIR/results/smooth/SRR62_1_filtered_smoothed.fastq.gz
+FILTERED2=$RDIR/results/smooth/SRR62_2_filtered_smoothed.fastq.gz
+QUARTZED1=$RDIR/results/smooth/SRR62_1_quartz.fastq.gz
+QUARTZED2=$RDIR/results/smooth/SRR62_2_quartz.fastq.gz
+ILLUMINA1=$RDIR/results/smooth/SRR62_1_smoothed_illumina.fastq.gz
+ILLUMINA2=$RDIR/results/smooth/SRR62_2_smoothed_illumina.fastq.gz
+LEONED1=$RDIR/quartz_files/SRR622461_1_leoned.fastq.gz
+LEONED2=$RDIR/quartz_files/SRR622461_2_leoned.fastq.gz
+
+PREFIX=SMOOTHED
+INPUT1=$SMOOTHED1
+INPUT2=$SMOOTHED2
+
+#Output directory
+NUM=$(date +%s)
+NAME=${PREFIX}_smoothed_paired
+DIREVAL=$RDIR/results/pipeline/${NAME}_eval_$NUM
+TEMP=$RDIR/results/pipeline/tmp$NUM
+BASENAME=$TEMP/$NAME
+
+#Temporary and output files
+LANETEMP=$TEMP/temporary.tmp
+SAM=$BASENAME.sam
+BAM=$BASENAME.bam
+SORTBAM=$BASENAME.sorted.bam
+BAMBED=$BASENAME.bed
+RAWVCF=$BASENAME.vcf.gz
+VCF=$BASENAME.filt.vcf.gz
+
+################## SCRIPT #########################
+>&2 date
+>&2 echo "Start script"
+mkdir $TEMP
+
+################## BWA #########################
+>&2 date && >&2 echo "--> bwa alignment"
+
+>&2 date && >&2 echo " -> bwa mem"
+$bwa mem -t $PCOUNT $REF $INPUT1 $INPUT2 > $SAM
+
+############### SAMTOOLS #######################
+>&2 date && >&2 echo "--> Clean up read pairing information and flags"
+$samtools fixmate -O bam $SAM $BAM
+rm $SAM
+
+>&2 date && >&2 echo "--> Sorting BAM file from name order to coordinate order"
+$samtools sort $BAM -T $LANETEMP -@ $PCOUNT -O bam -o $SORTBAM
+rm $BAM
+
+>&2 date && >&2 echo "--> Indexing BAM file"
+$samtools index $SORTBAM
+
+>&2 date && >&2 echo "--> BED file"
+$bedtools -i $SORTBAM > $BAMBED
+
+>&2 date && >&2 echo "--> Variant calling multithread"
+$samtools view -H $SORTBAM | grep '\@SQ' | sed 's/^.*SN://g' | cut -f 1 | xargs -I {} -n 1 -P $PCOUNT sh -c "$samtools mpileup -BQ0 -d 100000 -ugf $REF -r {} $SORTBAM | $bcftools call -vmO z > $BASENAME.tmp.{}.vcf.gz"
+
+>&2 date && >&2 echo "--> Merging vcf.gz files"
+ITEMLIST=$($samtools view -H $SORTBAM | grep '\@SQ' | sed 's/^.*SN://g' | awk '{print $1}')
+ITEM0=$($samtools view -H $SORTBAM | grep '\@SQ' | sed 's/^.*SN://g' | awk '{print $1}' | head -n 1)
+zcat $BASENAME.tmp.$ITEM0.vcf.gz | grep "#" | $bgzip > ${RAWVCF}
+for item in $ITEMLIST;
+do
+  zcat $BASENAME.tmp.$item.vcf.gz | grep -v "#" | $bgzip >> ${RAWVCF}
+  rm $BASENAME.tmp.$item.vcf.gz
+done
+
+rm $SORTBAM.bai
+rm $SORTBAM
+
+>&2 date && >&2 echo "--> Filtering"
+$bcftools index -f --threads $PCOUNT $RAWVCF
+$bcftools filter -O z --threads $PCOUNT -s LOWQUAL -e '%QUAL<20 || DP>100' $RAWVCF -o $VCF
+
+rm $RAWVCF.csi
+rm $RAWVCF
+
+############### RTGTOOL #########################
+>&2 date && >&2 echo "--> Vcf Evaluation"
+$rtg index -f vcf $VCF
+$rtg vcfeval -t $SDFREF -b $VCFREF --bed-regions=$VCFBED -c $VCF -e $BAMBED -f QUAL -o $DIREVAL
+
+rm $BAMBED
+rm $VCF
+rm $VCF.tbi
+
+>&2 echo "--> ROC"
+$rtg rocplot $DIREVAL/weighted_roc.tsv.gz --svg $DIREVAL/roc_$NUM.svg
+
+>&2 date && >&2 echo "--> cleaning"
+rm -r $TEMP
+
+>&2 date && echo "End script" 

@@ -1,0 +1,25 @@
+#RDIR=Your worksapce directory
+
+PCOUNT=1
+
+#Reference Files
+REF=$RDIR/reference/hg38.fa
+
+#Input files
+INPUT1=$RDIR/working_datasets/SRR622461_1.filt.fastq.gz
+INPUT1UNZ=$RDIR/quartz_files/SRR622461_1.filt.fastq
+
+#Output files
+OUTPUT1=$RDIR/results/smooth/SRR62_1_smoothed.fastq.gz
+OUTPUT1UNZ=$RDIR/results/smooth/SRR62_1_smoothed.fastq
+
+YALFF=$RDIR/executables/yalff
+
+################## SCRIPT #########################
+>&2 date
+>&2 echo "start yalff smoothing"
+
+time cat $INPUT1UNZ | $YALFF -d $REF -t $PCOUNT > $OUTPUT1UNZ
+
+>&2 date
+>&2 echo "end" 
