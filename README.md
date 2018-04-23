@@ -46,9 +46,9 @@ YALFF preserves the orders of the reads of the input files so there is no need f
 
         -t NUM	 Number of threads available. [Hardware concurrency - 1]
         
-        -sst NUM Smoothing algorithm. 0 checks all and only the k-mers considered. 1 applies a seed and extend search if a k-mer has no mismatches. [0]
+        -a NUM	 Smoothing algorithm. 0 checks all and only the k-mers considered. 1 applies a seed and extend search if a k-mer has no mismatches. [0]
 
-        -h 	     See this help.
+        -h	 See this help.
 
 [1]: http://cb.csail.mit.edu/cb/quartz
 [2]: http://en.wikipedia.org/wiki/GNU_General_Public_License
