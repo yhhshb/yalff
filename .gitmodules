@@ -1,3 +1,6 @@
 [submodule "src/bwa"]
 	path = src/bwa
 	url = https://github.com/lh3/bwa.git
+[submodule "src/CTPL"]
+	path = src/CTPL
+	url = https://github.com/vit-vit/CTPL.git
