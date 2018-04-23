@@ -27,6 +27,7 @@ struct yalff_opt_t{
     char replacement; //smoothing character
     char bad_replacement;
     std::size_t skip; //number of bases to skip
+    std::size_t smoother;
     bwaidx_t* index;
 };
 
@@ -62,7 +63,9 @@ int bwt_cal_width(const bwt_t *bwt, int len, const ubyte_t *str, bwt_width_t *wi
 
 std::pair<bwt_aln1_t*, int> getKmerMatches(bwt_t *bwt, int qlen, uint8_t* query, const gap_opt_t& opt);
 
-void smooth_chunk(int thread_id, const yalff_opt_t& yopt, semaphore& s, yalff_chunk_t& slice, std::size_t start, std::size_t stop);
+void smooth_chunk_static(int thread_id, const yalff_opt_t& yopt, semaphore& s, yalff_chunk_t& slice, std::size_t start, std::size_t stop);
+
+void smooth_chunk_dynamic(int thread_id, const yalff_opt_t& yopt, semaphore& s, yalff_chunk_t& slice, std::size_t start, std::size_t stop);
 
 void countBadQuals(const std::string& qs, std::size_t k, char thr, std::vector<k_t>& toRet);
 
@@ -118,7 +121,17 @@ int main(int argc, char* argv[])
         //use the thread pool to smooth it in parallel while writing the previous chunk
         for(auto interval : intervals)
         {
-            pool.push(smooth_chunk, std::ref(yopt), std::ref(sema), std::ref(chunks[chunk_counter]), interval.first, interval.second);
+            switch (yopt.smoother)
+            {
+                case 0:
+                    pool.push(smooth_chunk_static, std::ref(yopt), std::ref(sema), std::ref(chunks[chunk_counter]), interval.first, interval.second);
+                    break;
+                case 1:
+                    pool.push(smooth_chunk_dynamic, std::ref(yopt), std::ref(sema), std::ref(chunks[chunk_counter]), interval.first, interval.second);
+                    break;
+                default:
+                    pool.push(smooth_chunk_static, std::ref(yopt), std::ref(sema), std::ref(chunks[chunk_counter]), interval.first, interval.second);
+            }
         }
 
         //std::cerr << "Chunk processed" << std::endl;
@@ -213,6 +226,7 @@ yalff_opt_t yalff_init(int argc, char* argv[])
     opts.bad_threshold = '$';
     opts.good_threshold = 'I';
     opts.skip = 0;
+    opts.smoother = 0;
 
     //read the parameters
     for(int i = 1; i < argc; ++i)
@@ -283,6 +297,12 @@ yalff_opt_t yalff_init(int argc, char* argv[])
             ++i;
             opts.n_threads = strtoull(argv[i], nullptr, 10);
             if(opts.n_threads == 0) opts.n_threads = 1;
+        }
+        else if(strcmp(argv[i], "-sst") == 0)
+        {
+            //smooth algorithm
+            ++i;
+            opts.smoother = strtoull(argv[i], nullptr, 10);
         }
         else // -h option
         {
@@ -392,7 +412,27 @@ std::pair<bwt_aln1_t*, int> getKmerMatches(bwt_t *bwt, int qlen, uint8_t* query,
     return alignments;
 }
 
-void smooth_chunk(int thread_id, const yalff_opt_t& yopt, semaphore& s, yalff_chunk_t& slice, std::size_t start, std::size_t stop)
+void countBadQuals(const std::string& qs, std::size_t k, char thr, std::vector<k_t>& toRet)
+{
+    for(std::size_t i = 0; i < k; ++i)
+    {
+        if(qs[i] < thr)
+        {
+            ++toRet[0]; //increment count
+        }
+    }
+    for(uint8_t i = 1; i < static_cast<uint8_t>(qs.length() - k + 1); ++i)
+    {
+        if(qs[i-1] < thr) toRet[i] = toRet[i-1] - 1;
+        else toRet[i] = toRet[i-1];
+        if(qs[i+k-1] < thr)
+        {
+            ++toRet[i];
+        }
+    }
+}
+
+void smooth_chunk_static(int thread_id, const yalff_opt_t& yopt, semaphore& s, yalff_chunk_t& slice, std::size_t start, std::size_t stop)
 {
     //smooth thread
     s.wait(1);
@@ -481,22 +521,114 @@ void smooth_chunk(int thread_id, const yalff_opt_t& yopt, semaphore& s, yalff_ch
     static_cast<void>(thread_id);
 }
 
-void countBadQuals(const std::string& qs, std::size_t k, char thr, std::vector<k_t>& toRet)
+void smooth_chunk_dynamic(int thread_id, const yalff_opt_t& yopt, semaphore& s, yalff_chunk_t& slice, std::size_t start, std::size_t stop)
 {
-    for(std::size_t i = 0; i < k; ++i)
+    //smooth thread
+    s.wait(1);
+    for(; start != stop; ++start) //smooth the read
     {
-        if(qs[i] < thr)
+        SGLib::Fastq::FastqRecord& record = slice[start];
+
+        if(record.getSequenceRef().size() >= yopt.k)
         {
-            ++toRet[0]; //increment count
+            std::vector<uint8_t> read(record.getSequenceRef().size());
+            for(std::size_t i = 0; i < record.getSequenceRef().size(); ++i) read[i] = SGLib::base_to_int[static_cast<std::size_t>(record.getSequenceRef()[i])];
+
+            std::vector<bool> to_boost(record.getQualityRef().size(), true); //better cache utilization
+
+            std::vector<k_t> qmer_bad_count(read.size() - yopt.k + 1, 0); //number of bad qualities in each k-mer
+            countBadQuals(record.getQualityRef(), yopt.k, yopt.bad_threshold, qmer_bad_count);
+            std::vector<k_t> qmer_not_so_bad_count(qmer_bad_count.size(), 0); //number of qualities below the good threshold -> if 0 it means all good
+            countBadQuals(record.getQualityRef(), yopt.k, yopt.good_threshold, qmer_not_so_bad_count);
+
+            for(std::size_t i = 0; i < read.size() - yopt.k + 1; ++i)
+            {
+                if(qmer_not_so_bad_count[i] != 0 && qmer_bad_count[i] == 0)
+                {
+                    std::pair<bwt_aln1_t*, int> aln = getKmerMatches(yopt.index->bwt, static_cast<int>(yopt.k), &read[i], getAlnOpts(yopt));
+                    std::size_t skp = 0;
+                    bwa_seq_t alignment;
+                    bwa_aln2seq(aln.second, aln.first, &alignment); //get sa value
+                    if(alignment.type == BWA_TYPE_UNIQUE || alignment.type == BWA_TYPE_REPEAT) //Try for a match with at most yopt.mismatches mismatches
+                    {
+                        bwtint_t position = bwt_sa(yopt.index->bwt, alignment.sa);
+                        std::size_t b = 0;
+                        bool mf = false;
+                        while(!mf && i + yopt.k * (b + 1) < read.size())
+                        {
+                            int64_t len;
+                            uint8_t* ref_aln = bns_get_seq(yopt.index->bns->l_pac, yopt.index->pac, static_cast<int64_t>(position + yopt.k * b), static_cast<int64_t>(position + yopt.k * (b + 1)), &len);
+                            if(yopt.k == static_cast<std::size_t>(len)) // possible if out of range or crossed boundary -> error, skip this iteration
+                            {
+                                if(b == 0)
+                                {
+                                    for(std::size_t j = 0; j < yopt.k; ++j)//check where the mismatches are and set the to_boost vector accordingly
+                                    {
+                                        if(to_boost[i + j] && read[i + j] != ref_aln[j])
+                                        {
+                                            to_boost[i + j] = false;
+                                            mf = true;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    for(std::size_t j = 0; j < yopt.k && !mf; ++j)//extending match, this for is different from the other (that is why there is the if(b == 0)
+                                    {
+                                        if(read[i + yopt.k * b + j] == ref_aln[j]) ++skp;
+                                        else mf = true;
+                                    }
+                                }
+                            }
+                            free(ref_aln);
+                            ++b;
+                        }
+                    } else qmer_bad_count[i] = k_max;
+                    free(aln.first);
+                    if(yopt.skip != 0) i += (skp / yopt.skip) * yopt.skip; //integer operations, no floating point numbers
+                    else i += skp;
+                }
+            }
+
+            //Boost the quality values based on the qmer_bad_count and to_boost arrays.
+            bool good_block_started = false;
+            bool bad_block_started = false;
+            for(std::size_t i = 0; i < qmer_bad_count.size(); ++i)
+            {
+                if(qmer_bad_count[i] == 0) //start block of good k-mers
+                {
+                    if(!good_block_started)
+                    {
+                        for(std::size_t j = 0; j < yopt.k; ++j) if(to_boost[i + j]) record.setQualityScore(i + j, yopt.replacement);
+                        good_block_started = true;
+                        bad_block_started = false;
+                    }
+                    else
+                    {
+                        if(to_boost[i + yopt.k - 1]) record.setQualityScore(i + yopt.k - 1, yopt.replacement);
+                    }
+                }
+                else if(qmer_bad_count[i] == k_max) //start block of bad k-mers
+                {
+                    if(!bad_block_started)
+                    {
+                        for(std::size_t j = 0; j < yopt.k; ++j) if(yopt.bad_replacement < record.getQualityScore(i + j) && to_boost[i + j]) record.setQualityScore(i + j, yopt.bad_replacement);
+                        bad_block_started = true;
+                        good_block_started = false;
+                    }
+                    else
+                    {
+                        if(yopt.bad_replacement < record.getQualityScore(i + yopt.k - 1) && to_boost[i + yopt.k - 1]) record.setQualityScore(i + yopt.k - 1, yopt.bad_replacement);
+                    }
+                }
+                else //close block of good k-mers
+                {
+                    good_block_started = false;
+                    bad_block_started = false;
+                }
+            }
         }
     }
-    for(uint8_t i = 1; i < static_cast<uint8_t>(qs.length() - k + 1); ++i)
-    {
-        if(qs[i-1] < thr) toRet[i] = toRet[i-1] - 1;
-        else toRet[i] = toRet[i-1];
-        if(qs[i+k-1] < thr)
-        {
-            ++toRet[i];
-        }
-    }
+    s.signal(1);
+    static_cast<void>(thread_id);
 }

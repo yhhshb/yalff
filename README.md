@@ -45,6 +45,8 @@ YALFF preserves the orders of the reads of the input files so there is no need f
         -e CHAR	 Sanger value used as an eventual replacement when a k-mer aligns badly. [j]
 
         -t NUM	 Number of threads available. [Hardware concurrency - 1]
+        
+        -sst NUM Smoothing algorithm. 0 checks all and only the k-mers considered. 1 applies a seed and extend search if a k-mer has no mismatches. [0]
 
         -h 	     See this help.
 
