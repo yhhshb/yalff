@@ -6,7 +6,7 @@
 #include "bwtaln.h"
 #include "bwamem.h"
 
-#include "ctpl_stl.hpp"
+#include "CTPL/ctpl_stl.h"
 
 #include "Fastq.hpp"
 #include "QualityScores.hpp"

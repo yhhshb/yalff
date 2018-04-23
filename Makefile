@@ -3,7 +3,7 @@ TARGET_EXEC ?= yalff
 BUILD_DIR ?= ./build
 SRC_DIR ?= ./src
 
-SRCS := $(shell find $(SRC_DIR) -name *.cpp -or -name *.c -or -name *.s)
+SRCS := $(shell find $(SRC_DIR) ! -samefile "src/bwa/example.c" ! -samefile "src/bwa/main.c" ! -samefile "src/CTPL/example.cpp" \( -name *.cpp -or -name *.c -or -name *.s \) )
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
