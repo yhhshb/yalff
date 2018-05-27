@@ -2,6 +2,7 @@
 #define SGLIBBASE_HPP
 
 #include <vector>
+#include <functional>
 #include "SGLibConstants.hpp"
 
 namespace SGLib{
