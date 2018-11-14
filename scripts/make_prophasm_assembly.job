@@ -1,0 +1,29 @@
+#!/bin/bash
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+dictreader=$RDIR/tools/print_mitdb
+assembler=$RDIR/tools/prophasm/prophasm
+
+#PERCORSI FILE
+ref=$RDIR/reference/hg38.fa
+quartz_dict=$RDIR/quartz_files/dec200.bin.sorted
+quartz_squeezed=$RDIR/reference/dec200.reassembled.fa
+hg19kmers=$RDIR/quartz_files/hg19kmers.bin.sorted
+dbSNPkmers=$RDIR/quartz_files/dbSNPkmers.bin.sorted
+affykmers=$RDIR/quartz_files/affykmers.bin.sorted
+hg19_squeezed=$RDIR/quartz_files/hg19.reassembled.fa
+dbSNP_hg19_squeezed=$RDIR/quartz_files/dbSNPkmers.reassembled.fa
+affy_hg19_squeezed=$RDIR/quartz_files/affykmers.reassembled.fa
+mit_all=$RDIR/quartz_files/mit_all.reassembled.fa
+
+############# INDEX - FAIDX - SDF ##############
+>&2 date && >&2 echo "--> Reference squeezing using ProphAsm"
+
+# $dictreader -r $hg19kmers | $assembler -k 32 -i - -o $hg19_squeezed
+
+$dictreader -r $hg19kmers -s $dbSNPkmers | $assembler -k 32 -i - -o $dbSNP_hg19_squeezed
+$dictreader -r $hg19kmers -s $affykmers | $assembler -k 32 -i - -o $affy_hg19_squeezed
+$dictreader -r $hg19kmers -s $dbSNPkmers -s $affykmers -q $quartz_dict | $assembler -k 32 -i - -o $mit_all
+

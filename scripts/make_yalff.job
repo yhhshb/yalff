@@ -1,9 +1,13 @@
-#RDIR=Your worksapce directory
+#!/bin/bash
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
 YALFF_FOLDER=$RDIR/tools/yalff
 
 ################## SCRIPT #########################
 >&2 date
->&2 echo "make yalff"
+>&2 echo "Inizio script make"
 
 cd $YALFF_FOLDER
 make

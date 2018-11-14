@@ -1,0 +1,15 @@
+#!/bin/bash
+#$ -pe parallel 8
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+ass=$RDIR/tools/prophyle/prophyle/prophyle_assembler/prophyle_assembler
+
+#PERCORSI FILE
+ref=$RDIR/reference/hg38.fa
+squeezed=$RDIR/reference/hg38.reassembled.fa
+
+############# INDEX - FAIDX - SDF ##############
+>&2 date && >&2 echo "--> Reference squeezing using ProPhyle"
+$ass -k 32 -i $ref -o $squeezed

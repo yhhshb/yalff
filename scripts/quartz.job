@@ -1,17 +1,21 @@
-#RDIR=Your worksapce directory
+#!/bin/bash
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
 quartz=$RDIR/tools/quartz/quartz
 
-#Quartz dict
+#PERCORSI FILE
 dict=$RDIR/quartz_files/dec200.bin.sorted
 
-#VARIABLES
+#VARIABILI
 INPUT1=$RDIR/quartz_files/SRR622461_1.filt.fastq
 INPUT2=$RDIR/quartz_files/SRR622461_2.filt.fastq
 
 #################### QUARTZ ####################
 >&2 date
->&2 echo "start quartz smoothing"
+>&2 echo "Inizio script quartz"
 
 time $quartz $dict 'S' 1 0 $INPUT1 $INPUT2
 
->&2 date && >&2 echo "end"
+>&2 date && >&2 echo "Fine script quartz"

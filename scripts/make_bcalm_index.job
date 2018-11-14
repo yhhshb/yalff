@@ -1,0 +1,15 @@
+#!/bin/bash
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+bcalm=$RDIR/tools/bcalm/build/bcalm
+samtools=$RDIR/tools/samtools-1.5/samtools
+rtg=$RDIR/tools/rtg-tools-3.8.3/rtg
+
+#PERCORSI FILE
+ref=$RDIR/reference/hg38.fa
+
+############# INDEX - FAIDX - SDF ##############
+>&2 date && >&2 echo "--> Reference squeezing"
+$bcalm -in $ref -kmer-size 33 -abundance-min 1

@@ -1,4 +1,9 @@
-#RDIR=Your worksapce directory
+#!/bin/bash
+#$ -pe parallel 16
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
 bwa=$RDIR/tools/bwa-0.7.16a/bwa
 samtools=$RDIR/tools/samtools-1.5/samtools
 bcftools=$RDIR/tools/bcftools-1.5/bcftools
@@ -26,12 +31,18 @@ QUARTZED1=$RDIR/results/smooth/SRR62_1_quartz.fastq.gz
 QUARTZED2=$RDIR/results/smooth/SRR62_2_quartz.fastq.gz
 ILLUMINA1=$RDIR/results/smooth/SRR62_1_smoothed_illumina.fastq.gz
 ILLUMINA2=$RDIR/results/smooth/SRR62_2_smoothed_illumina.fastq.gz
+AFFY1=$RDIR/results/smooth/SRR62_1_affy_smoothed.fastq.gz
+AFFY2=$RDIR/results/smooth/SRR62_2_affy_smoothed.fastq.gz
+DBSNP1=$RDIR/results/smooth/SRR62_1_dbSNP_smoothed.fastq.gz
+DBSNP2=$RDIR/results/smooth/SRR62_2_dbSNP_smoothed.fastq.gz
+MITALL1=$RDIR/results/smooth/SRR62_1_mit_all_smoothed.fastq.gz
+MITALL2=$RDIR/results/smooth/SRR62_2_mit_all_smoothed.fastq.gz
 LEONED1=$RDIR/quartz_files/SRR622461_1_leoned.fastq.gz
 LEONED2=$RDIR/quartz_files/SRR622461_2_leoned.fastq.gz
 
-PREFIX=SMOOTHED
-INPUT1=$SMOOTHED1
-INPUT2=$SMOOTHED2
+PREFIX=MITALL
+INPUT1=$MITALL1
+INPUT2=$MITALL2
 
 #Output directory
 NUM=$(date +%s)
@@ -51,11 +62,11 @@ VCF=$BASENAME.filt.vcf.gz
 
 ################## SCRIPT #########################
 >&2 date
->&2 echo "Start script"
+>&2 echo "Inizio script pipeline"
 mkdir $TEMP
 
 ################## BWA #########################
->&2 date && >&2 echo "--> bwa alignment"
+>&2 date && >&2 echo "--> Allineamento con bwa"
 
 >&2 date && >&2 echo " -> bwa mem"
 $bwa mem -t $PCOUNT $REF $INPUT1 $INPUT2 > $SAM
@@ -69,10 +80,10 @@ rm $SAM
 $samtools sort $BAM -T $LANETEMP -@ $PCOUNT -O bam -o $SORTBAM
 rm $BAM
 
->&2 date && >&2 echo "--> Indexing BAM file"
+>&2 date && >&2 echo "--> Indicizzazione del file BAM"
 $samtools index $SORTBAM
 
->&2 date && >&2 echo "--> BED file"
+>&2 date && >&2 echo "--> Creazione del file BED"
 $bedtools -i $SORTBAM > $BAMBED
 
 >&2 date && >&2 echo "--> Variant calling multithread"
@@ -107,10 +118,10 @@ rm $BAMBED
 rm $VCF
 rm $VCF.tbi
 
->&2 echo "--> ROC"
+>&2 echo "--> Curva ROC"
 $rtg rocplot $DIREVAL/weighted_roc.tsv.gz --svg $DIREVAL/roc_$NUM.svg
 
->&2 date && >&2 echo "--> cleaning"
+>&2 date && >&2 echo "--> Pulizia file"
 rm -r $TEMP
 
->&2 date && echo "End script" 
+>&2 date && echo "Fine script pipeline." 

@@ -1,0 +1,25 @@
+#!/bin/bash
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+lava=$RDIR/tools/lava/lava
+
+#PERCORSI FILE
+reference=$RDIR/quartz_files/hg19.fa
+dbSNP=$RDIR/quartz_files/SNPs142_hg19_Common.filt.txt
+affy_db=$RDIR/quartz_files/Affymetrix_6_SNPs.txt
+
+#VARIABILI
+refkmers=$RDIR/quartz_files/reference_db.bin
+dbSNPkmers=$RDIR/quartz_files/dbSNPkmers.bin
+affykmers=$RDIR/quartz_files/affykmers.bin
+
+#################### QUARTZ ####################
+>&2 date
+>&2 echo "Start building LAVA dictionaries"
+
+$lava dict $reference $dbSNP $refkmers $dbSNPkmers
+$lava dict $reference $affy_db $refkmers $affykmers
+
+>&2 date && >&2 echo "Finished making lava dictionaries"

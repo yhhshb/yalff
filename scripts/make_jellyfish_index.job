@@ -1,0 +1,14 @@
+#!/bin/bash
+#$ -pe parallel 16
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+jellyfish=$RDIR/tools/jellyfish/jellyfish-2.2.9-linux-static
+
+#PERCORSI FILE
+ref=$RDIR/reference/hg38.fa
+
+############# INDEX - FAIDX - SDF ##############
+>&2 date && >&2 echo "--> Reference squeezing using ProPhyle"
+$jellyfish count -m 32 -s 100M -t 16 --out-counter-len 0 -C $ref

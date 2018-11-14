@@ -1,28 +1,38 @@
-#RDIR=Your worksapce directory
+#!/bin/bash
+#$ -pe parallel 4
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
 
 PCOUNT=4
 
-#gunzip -k $RDIR/results/smooth/SRR62_1_quartz.fastq.gz
-#bzip2 -k $RDIR/results/smooth/SRR62_1_quartz.fastq
-#xz -k $RDIR/results/smooth/SRR62_1_quartz.fastq
-#rm $RDIR/results/smooth/SRR62_1_quartz.fastq
+gunzip -k $RDIR/results/smooth/SRR62_1_affy_smoothed.fastq.gz
+bzip2 -k $RDIR/results/smooth/SRR62_1_affy_smoothed.fastq
+xz -k $RDIR/results/smooth/SRR62_1_affy_smoothed.fastq
+rm $RDIR/results/smooth/SRR62_1_affy_smoothed.fastq
 
-#gunzip -k $RDIR/results/smooth/SRR62_2_quartz.fastq.gz
-#bzip2 -k $RDIR/results/smooth/SRR62_2_quartz.fastq
-#xz -k $RDIR/results/smooth/SRR62_2_quartz.fastq
-#rm $RDIR/results/smooth/SRR62_2_quartz.fastq
+gunzip -k $RDIR/results/smooth/SRR62_2_affy_smoothed.fastq.gz
+bzip2 -k $RDIR/results/smooth/SRR62_2_affy_smoothed.fastq
+xz -k $RDIR/results/smooth/SRR62_2_affy_smoothed.fastq
+rm $RDIR/results/smooth/SRR62_2_affy_smoothed.fastq
 
-#gunzip -k $RDIR/results/smooth/SRR62_1_smoothed.fastq.gz
-#bzip2 -k $RDIR/results/smooth/SRR62_1_smoothed.fastq
-#xz -k $RDIR/results/smooth/SRR62_1_smoothed.fastq
-#rm $RDIR/results/smooth/SRR62_1_smoothed.fastq
+gunzip -k $RDIR/results/smooth/SRR62_1_dbSNP_smoothed.fastq.gz
+bzip2 -k $RDIR/results/smooth/SRR62_1_dbSNP_smoothed.fastq
+xz -k $RDIR/results/smooth/SRR62_1_dbSNP_smoothed.fastq
+rm $RDIR/results/smooth/SRR62_1_dbSNP_smoothed.fastq
 
-#gunzip -k $RDIR/results/smooth/SRR62_2_smoothed.fastq.gz
-#bzip2 -k $RDIR/results/smooth/SRR62_2_smoothed.fastq
-#xz -k $RDIR/results/smooth/SRR62_2_smoothed.fastq
-#rm $RDIR/results/smooth/SRR62_2_smoothed.fastq
+gunzip -k $RDIR/results/smooth/SRR62_2_dbSNP_smoothed.fastq.gz
+bzip2 -k $RDIR/results/smooth/SRR62_2_dbSNP_smoothed.fastq
+xz -k $RDIR/results/smooth/SRR62_2_dbSNP_smoothed.fastq
+rm $RDIR/results/smooth/SRR62_2_dbSNP_smoothed.fastq
 
-bzip2 -k $RDIR/quartz_files/SRR622461_1.filt.fastq
-bzip2 -k $RDIR/quartz_files/SRR622461_2.filt.fastq
-xz -k $RDIR/quartz_files/SRR622461_1.filt.fastq
-xz -k $RDIR/quartz_files/SRR622461_2.filt.fastq
+gunzip -k $RDIR/results/smooth/SRR62_1_mit_all_smoothed.fastq.gz
+bzip2 -k $RDIR/results/smooth/SRR62_1_mit_all_smoothed.fastq
+xz -k $RDIR/results/smooth/SRR62_1_mit_all_smoothed.fastq
+rm $RDIR/results/smooth/SRR62_1_mit_all_smoothed.fastq
+
+gunzip -k $RDIR/results/smooth/SRR62_2_mit_all_smoothed.fastq.gz
+bzip2 -k $RDIR/results/smooth/SRR62_2_mit_all_smoothed.fastq
+xz -k $RDIR/results/smooth/SRR62_2_mit_all_smoothed.fastq
+rm $RDIR/results/smooth/SRR62_2_mit_all_smoothed.fastq

@@ -1,9 +1,16 @@
-#RDIR=Your worksapce directory
+#!/bin/bash
+#$ -pe parallel 4
+#$ -cwd -m ea
 
-PCOUNT=1
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+
+PCOUNT=4
 
 #Reference Files
-REF=$RDIR/reference/hg38.fa
+AFFYREF=$RDIR/reference/affykmers.reassembled.fa
+DBSNPREF=$RDIR/reference/dbSNPkmers.reassembled.fa
+MITALLREF=$RDIR/reference/mit_all.reassembled.fa
 
 #Input files
 INPUT1=$RDIR/working_datasets/SRR622461_1.filt.fastq.gz
@@ -12,14 +19,24 @@ INPUT1UNZ=$RDIR/quartz_files/SRR622461_1.filt.fastq
 #Output files
 OUTPUT1=$RDIR/results/smooth/SRR62_1_smoothed.fastq.gz
 OUTPUT1UNZ=$RDIR/results/smooth/SRR62_1_smoothed.fastq
+AFFYOUTPUT=$RDIR/results/smooth/SRR62_1_affy_smoothed.fastq.gz
+DBSNPOUTPUT=$RDIR/results/smooth/SRR62_1_dbSNP_smoothed.fastq.gz
+MITALLOUTPUT=$RDIR/results/smooth/SRR62_1_mit_all_smoothed.fastq.gz
 
 YALFF=$RDIR/executables/yalff
 
 ################## SCRIPT #########################
 >&2 date
->&2 echo "start yalff smoothing"
+>&2 echo "Inizio script smoothing 1"
 
-time cat $INPUT1UNZ | $YALFF -d $REF -t $PCOUNT > $OUTPUT1UNZ
+# zcat $INPUT1 | $YALFF -d $AFFYREF -b \' -t $PCOUNT | gzip > $AFFYOUTPUT
+# >&2 echo "smoothing affy completato"
+
+# zcat $INPUT1 | $YALFF -d $DBSNPREF -b \' -t $PCOUNT | gzip > $DBSNPOUTPUT
+# >&2 echo "smoothing dbSNP completato"
+
+zcat $INPUT1 | $YALFF -d $MITALLREF -b \' -t $PCOUNT | gzip > $MITALLOUTPUT
+>&2 echo "smoothing mit_all completato"
 
 >&2 date
->&2 echo "end" 
+>&2 echo "Fine script smoothing 1" 

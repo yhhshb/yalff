@@ -1,0 +1,27 @@
+#!/bin/bash
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+prophex=$RDIR/tools/prophex/prophex
+samtools=$RDIR/tools/samtools-1.5/samtools
+rtg=$RDIR/tools/rtg-tools-3.8.3/rtg
+
+#PERCORSI FILE
+ref=$RDIR/prophex_reference/hg38.fa
+
+REF=${ref%.*}.fa
+SDFREF=${REF%.*}.sdf
+
+################## SCRIPT #########################
+>&2 date
+>&2 echo "Inizio script pipeline"
+
+############# INDEX - FAIDX - SDF ##############
+>&2 date && >&2 echo "--> Indicizzazione reference file con prophex"
+$prophex build -k 32 -s $REF
+
+## >&2 date && >&2 echo " -> samtools faidx"
+## $samtools faidx $REF
+## >&2 date && >&2 echo " -> rtg format sdf"
+## $rtg format -o $SDFREF $REF

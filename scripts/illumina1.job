@@ -1,4 +1,9 @@
-#RDIR=Your worksapce directory
+#!/bin/bash
+#$ -pe parallel 8
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
 
 #Input files
 INPUT1=$RDIR/results/smooth/SRR62_1_smoothed.fastq.gz
@@ -11,8 +16,8 @@ OUTPUT2=$RDIR/results/smooth/SRR62_2_smoothed_illumina.fastq.gz
 PTM=$RDIR/executables/PTM
 
 ################## SCRIPT #########################
->&2 date && echo "start illumina smoothing"
+>&2 date && echo "Inizio script illumina"
 
 $PTM illumina $INPUT1 $OUTPUT1
 
->&2 date && echo "end" 
+>&2 date && echo "Fine script smoothing" 

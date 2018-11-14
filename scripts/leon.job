@@ -1,9 +1,14 @@
-#RDIR=Your worksapce directory
+#!/bin/bash
+#$ -pe parallel 1
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
 leon=$RDIR/tools/leon-v1.0.0-bin-Linux/bin/leon
 
 PCOUNT=1
 
-#VARIABLES
+#VARIABILI
 INPUT1=$RDIR/quartz_files/SRR622461_1.filt.fastq
 INPUT2=$RDIR/quartz_files/SRR622461_2.filt.fastq
 OUTPUT1=$RDIR/quartz_files/SRR622461_1_leoned.fastq
@@ -13,7 +18,7 @@ LEONED2=$RDIR/quartz_files/SRR622461_2_leoned.fastq
 
 #################### QUARTZ ####################
 >&2 date
->&2 echo "start leon smoothing"
+>&2 echo "Inizio script leon"
 
 time $leon -file $INPUT1 -c -nb-cores $PCOUNT
 time $leon -file $INPUT2 -c -nb-cores $PCOUNT
@@ -33,4 +38,4 @@ time $leon -file $OUTPUT2.leon -d -nb-cores $PCOUNT
 #xz -k $LEONED1
 #xz -k $LEONED2
 
->&2 date && >&2 echo "end"
+>&2 date && >&2 echo "Fine script leon"

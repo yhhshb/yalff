@@ -1,0 +1,39 @@
+#!/bin/bash
+#$ -cwd -m ea
+
+#PERCORSI TOOLS
+RDIR=/nfsd/bcb/bcbg/shibuyay/Tesi
+bwa=$RDIR/tools/bwa-0.7.16a/bwa
+samtools=$RDIR/tools/samtools-1.5/samtools
+rtg=$RDIR/tools/rtg-tools-3.8.3/rtg
+
+#PERCORSI FILE
+# ref=$RDIR/reference/mit_all.reassembled.fa
+
+AFFYREF=$RDIR/reference/affykmers.reassembled.fa
+DBSNPREF=$RDIR/reference/dbSNPkmers.reassembled.fa
+MITALLREF=$RDIR/reference/mit_all.reassembled.fa
+AFFYSDFREF=${AFFYREF%.*}.sdf
+DBSNPSDFREF=${DBSNPREF%.*}.sdf
+MITALLSDFREF=${MITALLREF%.*}.sdf
+
+################## SCRIPT #########################
+>&2 date
+>&2 echo "Inizio script pipeline"
+
+############# INDEX - FAIDX - SDF ##############
+>&2 date && >&2 echo "--> Indicizzazione reference file"
+>&2 date && >&2 echo " -> bwa index"
+$bwa index $AFFYREF
+$bwa index $DBSNPREF
+$bwa index $MITALLREF
+
+>&2 date && >&2 echo " -> samtools faidx"
+$samtools faidx $AFFYREF
+$samtools faidx $DBSNPREF
+$samtools faidx $MITALLREF
+
+>&2 date && >&2 echo " -> rtg format sdf"
+$rtg format -o $AFFYSDFREF $AFFYREF
+$rtg format -o $DBSNPSDFREF $DBSNPREF
+$rtg format -o $MITALLSDFREF $MITALLREF
