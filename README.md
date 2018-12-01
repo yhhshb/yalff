@@ -11,7 +11,7 @@ Version presented at [BITS Turin 2018][2] "Better quality score compression thro
 
 The fastest way to get started is by indexing a reference genome for the reads to be compressed. YALFF is 100% compliant with the index produced by **bwa**. So compliant that the whole indexing procedure and shared memory operations are handled by bwa himself with the implicit advantage of not requiring a separate construction if an index is already available.
 
-A copy of [bwa][3] is downloaded as an external dependency (remember to clone with the 'git clone --recurse-submodules <this-repo>' flag).
+A copy of [bwa][3] is downloaded as an external dependency (remember to clone with the '--recurse-submodules' flag).
 
 ## Most performant solution
 
@@ -35,13 +35,18 @@ The results produced by this index are better both in terms of overall compressi
 ## Evaluation
 
 The Precision, Recall and F-Measure are computed aligning the smoothed dataset to a reference and comparing the quality to a standard ground truth. The dataset used for comparison in our study is the Platinum genome NA12878 and relative vcf files downloaded from the Illumina ftp (which is open access and if it asks for a password just continue).
+
 A [script](scripts/evaluation.job) is available containing the whole pipeline used for evaluation.
 
 ## Availability
 
 ~~YALFF is released under [GPL][14].~~
-YALFF has been re-licenced under the more permissive [MIT](./LICENSE) licence. 
-Be aware that the final executable **will be GPL-ed** because of the linking at object level. I am currently not 100% about this, the only GPL component is required by the index construction procedure which lives inside bwa and many source files of bwa are MIT themselves. If someone is a lawyer and knows the licence of every source file in bwa please let me know.
+
+YALFF has been re-licenced under the more permissive [MIT](./LICENSE) licence.
+Be aware that the final executable **will be GPL-ed** because of the linking at object level. 
+
+I am currently not 100% about this, the only GPL component is required by the index construction procedure which lives inside bwa and many source files of bwa are MIT themselves. If someone is a lawyer and knows the licence of every source file in bwa please let me know.
+
 Because YALFF uses some BWA functions and the same format for the index, it requires the [zlib][15] dependency.
 
 ## Usage
