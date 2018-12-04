@@ -23,7 +23,7 @@ For this purpose the script folder contains the utility print_mitdb.c to print t
 The whole procedure can be described as follows:
 
 1. Download the Quartz dictionary from the original links [1][7] and [2][8].
-2. Clone the [LAVA repository][9], compile it and download the [hg17][10]and the associated SNP lists [dbSNPs][11], [affy][12].
+2. Clone the [LAVA repository][9], compile it and download the [hg17][10] and the associated SNP lists [dbSNPs][11], [affy][12].
 3. Run LAVA on its files to construct its reference indeces.
 4. Use [print_mitdb.c](scripts/print_mitdb.c) to stream the contents of the 4 dictionaries (the unswapped one for Quartz and the 3 for LAVA) to the Prophasm assembler.
 5. Index the FASTA file produced by the assembler.
