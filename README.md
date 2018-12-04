@@ -43,9 +43,7 @@ A [script](scripts/evaluation.job) is available containing the whole pipeline us
 ~~YALFF is released under [GPL][14].~~
 
 YALFF has been re-licenced under the more permissive [MIT](./LICENSE) licence.
-Be aware that the final executable **will be GPL-ed** because of the linking at object level. 
-
-I am currently not 100% about this, the only GPL component is required by the index construction procedure which lives inside bwa and many source files of bwa are MIT themselves. If someone is a lawyer and knows the licence of every source file in bwa please let me know.
+Be aware that the final executable **will be GPL-ed** because of the linking at object level with bwa.
 
 Because YALFF uses some BWA functions and the same format for the index, it requires the [zlib][15] dependency.
 
