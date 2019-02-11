@@ -65,7 +65,9 @@ YALFF preserves the orders of the reads of the input files so there is no need f
         zcat file.fastq.gz | ./yalff -shm index.fa | gzip > file_smoothed.fastq.gz
         bwa shm -d
         
-* Other options available are:
+* All the options available are:
+
+        -d STR   Reference file in fasta format.
 
         -k NUM	 k-mer length. [32] (max = 255 excluded)
 
@@ -85,7 +87,9 @@ YALFF preserves the orders of the reads of the input files so there is no need f
 
         -t NUM	 Number of threads available. [Hardware concurrency - 1]
         
-        -a NUM	 Smoothing algorithm. 0 checks all and only the k-mers considered. 1 applies a seed and extend search if a k-mer has no mismatches. [0]
+        -sst NUM Smoothing algorithm. 0 checks all and only the k-mers considered. 1 applies a seed and extend search if a k-mer has no mismatches. [0]
+        
+        -shm STR Reference file loaded into shared memory.
         
         -h       See this help.
 
