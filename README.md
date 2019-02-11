@@ -67,7 +67,7 @@ YALFF preserves the orders of the reads of the input files so there is no need f
         
 * All the options available are:
 
-        -d STR   Reference file in fasta format.
+        -d STR	 Reference file in fasta format.
 
         -k NUM	 k-mer length. [32] (max = 255 excluded)
 
@@ -86,11 +86,11 @@ YALFF preserves the orders of the reads of the input files so there is no need f
         -e CHAR	 Sanger value used as an eventual replacement when a k-mer aligns badly. [j]
 
         -t NUM	 Number of threads available. [Hardware concurrency - 1]
-        
+
         -sst NUM    Smoothing algorithm. 0 checks all and only the k-mers considered. 1 applies a seed and extend search if a k-mer has no mismatches. [0]
-        
+
         -shm STR    Reference file loaded into shared memory.
-        
+
         -h       See this help.
 
 [1]: http://cb.csail.mit.edu/cb/quartz
