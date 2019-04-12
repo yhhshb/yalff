@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/124078095.svg)](https://zenodo.org/badge/latestdoi/124078095)
+
 ## Introduction
 
 YALFF (Yet Another Lossy FASTQ Filter) is a lossy ~~compressor~~ smoother (see NOTE) for FASTQ files which uses a Burrows and Wheeler Transform as an index.
