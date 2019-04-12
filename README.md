@@ -34,6 +34,8 @@ The commands described here can be found at the [scripts folder](./scripts).
 
 The results produced by this index are better both in terms of overall compression, Precision and Recall than the standard reference, similarly to what happens in [GeneCodeq][13].
 
+All the reassebled indeces are available at: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2637994.svg)](https://doi.org/10.5281/zenodo.2637994)
+
 ## Evaluation
 
 The Precision, Recall and F-Measure are computed aligning the smoothed dataset to a reference and comparing the quality to a standard ground truth. The dataset used for comparison in our study is the Platinum genome NA12878 and relative vcf files downloaded from the Illumina ftp (which is open access and if it asks for a password just continue).
