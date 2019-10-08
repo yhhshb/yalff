@@ -16,7 +16,7 @@ cd yalff
 make
 ```
 
-The current stable version can be found at: [![DOI](https://zenodo.org/badge/124078095.svg)](https://zenodo.org/badge/latestdoi/124078095) but it does not comprehend a copy of bwa which must be downloaded and added separately.
+The current stable version can be found at: [![DOI](https://zenodo.org/badge/124078095.svg)](https://zenodo.org/badge/latestdoi/124078095) but it does not comprehend a copy of [bwa][3] nor a copy of the [CTPL][17] library which must be downloaded and added separately.
 
 ## Smoothing by using a reference
 
@@ -118,4 +118,5 @@ Be aware that the final executable **will be GPL-ed** because of the linking at 
 [14]: http://en.wikipedia.org/wiki/GNU_General_Public_License
 [15]: http://zlib.net
 [16]: http://www.bioinformatics.biostec.org/
+[17]: https://github.com/vit-vit/CTPL
 
