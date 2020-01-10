@@ -1,3 +1,11 @@
+## Publications
+
+* [Better quality score compression through sequence-based quality smoothing](https://doi.org/10.1186/s12859-019-2883-5)
+    Presented at [BITS Turin 2018][2].
+
+* [Indexing k-mers in linear-space for quality value compression](https://doi.org/10.1142/S0219720019400110)
+    Presented at [BIOINFORMATICS 2019][16].
+
 ## Introduction
 
 YALFF (Yet Another Lossy FASTQ Filter) is a smoother for FASTQ files which uses an FM-Index to store the k-mer database.
@@ -5,28 +13,11 @@ The compressed index greatly reduces the amount of memory required compared to o
 
 The actual compression is achieved by standard lossless compressors such as gzip, bzip2 and xz. The compression ratio is increased by the smoothing procedure which basically reduces entropy by replacing most of the quality values with a fixed value. The algorithm guarantees that the most relevant qualities for downstream analysis are kept untouched.
 
-## Installation
-
-YALFF links statically to **bwa** to use its FM-Index implementation and shared memory capabilities. This has the implicit advantage of not requiring a separate construction step if an index is already available.
-The [zlib][15] library is the only system-wide dependency required.
-
-```sh
-git clone --recursive https://github.com/yhhshb/yalff.git
-cd yalff
-make
-```
-
-The current stable version can be found at: [![DOI](https://zenodo.org/badge/124078095.svg)](https://zenodo.org/badge/latestdoi/124078095) but it does not comprehend a copy of [bwa][3] nor a copy of the [CTPL][17] library which must be downloaded and added separately.
-
-## Smoothing by using a reference
-
-Version presented at [BITS Turin 2018][2] "Better quality score compression through sequence-based quality smoothing".
+## [Smoothing by using a reference](https://doi.org/10.1186/s12859-019-2883-5)
 
 The most easy way to have a reliable set of k-mers to work with is by indexing an already available reference genome. This option is recommended if one doesn't have a list of known SNPs and/or a reassembly procedure of all the k-mers coming from real datasets would be too expensive to carry on.
 
-## SNPs-Aware solution
-
-Version presented at [BIOINFORMATICS 2019][16] "Indexing k-mers in linear-space for quality value compression".
+## [SNPs-Aware solution](https://doi.org/10.1142/S0219720019400110)
 
 If a set of SNPs is known it is possible to add the mutated k-mers into the reference to smooth a larger number of values and to signal the correctness of a base to downstream analysis.
 All the reassebled indeces used in our studies can be found at: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2637994.svg)](https://doi.org/10.5281/zenodo.2637994) 
@@ -44,6 +35,19 @@ The whole procedure can be described as follows:
 5. Index the FASTA file produced by the assembler.
 
 The commands described here can be found at the [scripts folder](./scripts).
+
+## Installation
+
+YALFF links statically to **bwa** to use its FM-Index implementation and shared memory capabilities. This has the implicit advantage of not requiring a separate construction step if an index is already available.
+The [zlib][15] library is the only system-wide dependency required.
+
+```sh
+git clone --recursive https://github.com/yhhshb/yalff.git
+cd yalff
+make
+```
+
+The current stable version can be found at: [![DOI](https://zenodo.org/badge/124078095.svg)](https://zenodo.org/badge/latestdoi/124078095) but it does not comprehend a copy of [bwa][3] nor a copy of the [CTPL][17] library which must be downloaded and added separately.
 
 ## Evaluation
 
